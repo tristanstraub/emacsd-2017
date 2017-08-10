@@ -1,0 +1,5 @@
+** Undo tree
+#+begin_src emacs-lisp
+  (ensure-package 'undo-tree)
+  (global-undo-tree-mode)
+#+end_src

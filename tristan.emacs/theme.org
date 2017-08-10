@@ -1,0 +1,18 @@
+** Theme
+
+#+begin_src emacs-lisp
+
+
+;;  (ensure-package 'alect-themes)
+;;  (ensure-package 'spacemacs-theme)
+;;  (ensure-package 'replace-colorthemes)
+
+;;  (ensure-package 'solarized-emacs)
+  ;;(load-theme 'solarized-dark)
+
+
+  ;;(load-theme 'alect-black-alt)
+  (load-theme 'deeper-blue)
+
+
+#+end_src

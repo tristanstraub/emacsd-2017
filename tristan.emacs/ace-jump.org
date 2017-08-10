@@ -1,0 +1,6 @@
+** Ace-jump
+
+#+begin_src emacs-lisp
+  (ensure-package 'ace-jump-mode)
+  (define-key global-map (kbd "C-0") 'ace-jump-mode)
+#+end_src

@@ -1,0 +1,3 @@
+#+begin_src emacs-lisp
+  (ensure-package 'iedit)
+#+end_src

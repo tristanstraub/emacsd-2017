@@ -1,0 +1,58 @@
+#+BEGIN_SRC
+(defun set-terminal-width ()
+  (let ((width (window-body-width)))
+    (cider-interactive-eval (format "(alter-var-root #'clojure.pprint/*print-right-margin* (constantly %d))" width))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(defun load-config (file)
+  (org-babel-load-file (expand-file-name (concat "tristan.emacs/" file) init-dir)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(message "Loading start")
+(defvar startup nil)
+
+(ensure-package 'exec-path-from-shell)
+
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
+
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(defun mac-metas ()
+ "for mac keyboard"
+ (setq mac-option-modifier 'super)
+ (setq mac-command-modifier 'meta))
+
+(defun ergo-metas ()
+ "For ergonomic keyboard"
+ (setq mac-option-modifier 'meta)
+ (setq mac-command-modifier 'super))
+
+(mac-metas)
+;;(ergo-metas)
+
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (load-config "iedit.org")
+  (load-config "defaults.org")
+  (load-config "server.org")
+  (load-config "magit.org")
+  (load-config "ivy.org")
+  (load-config "multicursor.org")
+  (load-config "ace-jump.org")
+  (load-config "clojure.org")
+  (load-config "theme.org")
+  (load-config "autocomplete.org")
+  (load-config "whitespace.org")
+  (load-config "yas.org")
+  (load-config "undo-tree.org")
+  (load-config "helm.org")
+  ;;(load-config "tristan.org")
+#+END_SRC
+
+#+RESULTS:
+: Loaded /Users/tristanstraub/.emacs.d/tristan.emacs/helm.el

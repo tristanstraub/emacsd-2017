@@ -1,0 +1,7 @@
+* Server
+
+#+BEGIN_SRC emacs-lisp
+  (load "server")
+  (unless (server-running-p)
+    (server-start))
+#+END_SRC

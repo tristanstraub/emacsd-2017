@@ -1,0 +1,130 @@
+* clojure
+#+begin_src emacs-lisp
+;;  (ensure-package 'inflections)
+  (ensure-package 'seq)
+  (ensure-package 'clj-refactor)
+  ;;(load-file (expand-file-name "site-lisp/clj-autotest.el" init-dir))
+  (add-to-list 'auto-mode-alist '("\\.boot\\'" . clojure-mode))
+  (add-to-list 'magic-mode-alist '(".* boot" . clojure-mode))
+
+;;  (require 'clj-autotest)
+
+    (global-set-key (kbd "M-r") 'move-to-window-line-top-bottom)
+
+  ;; show matching parens
+  (show-paren-mode 1)
+#+end_src
+
+* Cider
+
+#+begin_src emacs-lisp
+  (setq org-babel-clojure-backend 'cider)
+  (ensure-package 'cider)
+
+  (defun cider-repl-custom-settings ()
+    (message "preventing cider repl other window")
+    (set-window-parameter (first (window-list)) 'no-other-window t))
+
+  (defun make-untouchable ()
+    (interactive)
+    (set-window-parameter (first (window-list)) 'no-other-window t))
+
+  (defun cider-custom-settings ()
+    (add-hook 'window-configuration-change-hook 'set-terminal-width nil t))
+
+;;  (add-hook 'cider-repl-mode-hook 'cider-custom-settings)
+
+  ;;(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+  ;;(add-hook 'cider-repl-mode-hook 'cider-repl-custom-settings)
+
+  (defun fig ()
+    (interactive)
+
+    (cider-connect "localhost" 7888 (cdr (project-root-fetch))))
+
+(ensure-package 'ac-cider)
+
+(add-hook 'cider-mode-hook 'ac-flyspell-workaround)
+(add-hook 'cider-mode-hook 'ac-cider-setup)
+(add-hook 'cider-repl-mode-hook 'ac-cider-setup)
+(eval-after-load "auto-complete"
+  '(progn
+     (add-to-list 'ac-modes 'cider-mode)
+     (add-to-list 'ac-modes 'cider-repl-mode)))
+#+end_src
+
+* Paredit in clojure-mode
+
+* Paredit
+
+#+begin_src emacs-lisp
+(setq section 'paredit)
+  (ensure-package 'paredit)
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun clojure-mode-settings ()
+   (paredit-mode 1)
+   (cider-mode 1)
+   (show-paren-mode)
+   ;; (iimage-mode 1)
+   )
+
+  ;; (let ((map (make-sparse-keymap)))
+  ;;   (setq iimage-mode-map map))
+  ;; (define-key iimage-mode-map "\C-c/" nil)
+  (add-hook 'clojure-mode-hook 'clojure-mode-settings)
+#+end_src
+* align-cljlet
+#+BEGIN_SRC emacs-lisp
+(ensure-package 'align-cljlet)
+(define-key clojure-mode-map (kbd "C-c l") 'align-cljlet)
+#+END_SRC
+
+* special forms
+#+BEGIN_SRC emacs-lisp
+(put-clojure-indent 'prop/for-all 1)
+(put-clojure-indent 'fact-qc 1)
+(put-clojure-indent 'fact 1)
+(put-clojure-indent 'qc/for-all 1)
+(put-clojure-indent 'fact-quickcheck 1)
+(put-clojure-indent 'match 1)
+(put-clojure-indent 'component/using 1)
+
+
+#+END_SRC
+
+* clj-refactor
+#+BEGIN_SRC emacs-lisp
+  (defun my-clojure-mode-hook ()
+      (message "my clojure mode hook")
+      (clj-refactor-mode 1)
+      (yas-minor-mode 1) ; for adding require/use/import
+      (cljr-add-keybindings-with-prefix "C-c C-m"))
+
+  (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
+#+END_SRC
+* flycheck
+
+#+BEGIN_SRC emacs-lisp
+
+
+
+(ensure-package 'flycheck-clojure)
+(eval-after-load 'flycheck '(flycheck-clojure-setup))
+(add-hook 'after-init-hook #'global-flycheck-mode)
+
+(ensure-package 'flycheck-pos-tip)
+(eval-after-load 'flycheck
+  '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
+
+(setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc clojure-cider-typed))
+;;(setq-default flycheck-disabled-checkers '())
+
+#+END_SRC
+
+* helm-cider
+#+BEGIN_SRC emacs-lisp
+(ensure-package 'helm-cider)
+(helm-cider-mode 1)
+#+END_SRC

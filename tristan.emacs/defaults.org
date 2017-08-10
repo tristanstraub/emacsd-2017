@@ -1,0 +1,23 @@
+#+BEGIN_SRC emacs-lisp
+  (global-linum-mode 1)
+  (fset 'yes-or-no-p 'y-or-n-p)
+
+  (prefer-coding-system 'utf-8)
+  (global-auto-revert-mode t)
+
+  (setq create-lockfiles nil)
+
+  (defvar dotfiles-dir nil)
+  (setq dotfiles-dir (expand-file-name "./" "~/"))
+
+  ;; Don't clutter up directories with files~
+  (setq backup-directory-alist `(("." . ,(expand-file-name
+				      (concat dotfiles-dir "backups")))))
+
+  ;; Don't clutter with #files either
+  (setq auto-save-file-name-transforms
+	`((".*" ,(expand-file-name (concat dotfiles-dir "backups")))))
+
+  (global-set-key (kbd "C-c r") 'revert-buffer)
+  (global-set-key (kbd "M-j") 'join-line)
+#+end_src

@@ -1,0 +1,30 @@
+** ivy/swiper
+
+#+begin_src emacs-lisp
+(ensure-package 'swiper)
+(ivy-mode 1)
+(setq ivy-use-virtual-buffers t)
+
+(defun ivy-dired ()
+  (interactive)
+  (if ivy--directory
+      (ivy-quit-and-run
+       (dired ivy--directory)
+       (when (re-search-forward
+              (regexp-quote
+               (substring ivy--current 0 -1)) nil t)
+         (goto-char (match-beginning 0))))
+    (user-error
+     "Not completing files currently")))
+#+end_src
+
+
+** Swiper keys
+
+#+begin_src emacs-lisp
+(global-set-key "\C-s" 'swiper)
+(global-set-key "\C-r" 'swiper)
+(global-set-key (kbd "C-c C-r") 'ivy-resume)
+(define-key ivy-minibuffer-map (kbd "C-d") 'ivy-dired)
+;;(global-set-key [f6] 'ivy-resume)
+#+end_src

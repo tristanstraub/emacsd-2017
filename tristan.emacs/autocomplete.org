@@ -1,0 +1,5 @@
+** Autocomplete
+#+BEGIN_SRC emacs-lisp
+(ensure-package 'auto-complete)
+#+END_SRC
+

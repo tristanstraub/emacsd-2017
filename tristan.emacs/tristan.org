@@ -1,0 +1,860 @@
+** Deft
+#+BEGIN_SRC emacs-lisp
+(ensure-package 'deft)
+(setq deft-extensions '("org" "tex" "txt"))
+(setq deft-directory "~/me/org/")
+(setq deft-recursive t)
+(global-set-key [f6] 'deft)
+#+END_SRC
+
+** Packages
+#+begin_src emacs-lisp
+  (ensure-package 'hydra)
+#+end_src
+
+** Paths
+
+#+begin_src emacs-lisp
+  (add-to-list 'load-path (expand-file-name "src" "~/.emacs.d"))
+  ;;(add-to-list 'custom-theme-load-path (expand-file-name "src/replace-colorthemes" "~/.emacs.d"))
+
+#+end_src
+
+** Text
+
+#+begin_src emacs-lisp
+  (setq tab-width 2)
+  (setq-default indent-tabs-mode nil)
+#+end_src
+
+** Audio
+
+#+begin_src emacs-lisp
+  (defun raise-volume ()
+    (interactive)
+    (shell-command "amixer set Master 2+"))
+
+  (defun lower-volume ()
+    (interactive)
+    (shell-command "amixer set Master 2-"))
+#+end_src
+
+** Workgroups
+  #  #+begin_src emacs-lisp
+  # (ensure-package 'workgroups)
+  # (setq wg-prefix-key (kbd "C-c w"))
+  # (workgroups-mode 1)
+  # (wg-load (expand-file-name "workgroups" "~/.emacs.d"))
+  #  #+end_src
+
+** Ace-window for quick window switching
+#+begin_src emacs-lisp
+  (ensure-package 'ace-window)
+#+end_src
+
+** COMMENT [guide key] Describes key bindings
+#+begin_src emacs-lisp
+  (ensure-package 'guide-key)
+  (setq guide-key/guide-key-sequence '("C-x" "C-c w" "C-c C-m" "C-c p"))
+  ;; not working with ecb
+  (guide-key-mode nil)
+  (setq guide-key/recursive-key-sequence-flag t)
+  (setq guide-key/popup-window-position 'bottom)
+#+end_src
+
+** delsel
+#+begin_src emacs-lisp
+  (ensure-package 'delsel)
+#+end_src
+
+** wgrep
+#+begin_src emacs-lisp
+(ensure-package 'wgrep)
+#+end_src
+
+** my-other-window
+#+begin_src emacs-lisp
+(require 'cl)
+(defvar avoid-window-regexp "^.*eshell.*$")
+(setq avoid-window-regexp (regexp-quote "*eshell*"))
+
+(defun my-other-window ()
+  "Similar to 'other-window, only try to avoid windows whose buffers match avoid-window-regexp"
+  (interactive)
+  (let* ((window-list (delq (selected-window) (window-list)))
+         (filtered-window-list (remove-if
+                                (lambda (w)
+                                  (string-match-p avoid-window-regexp (buffer-name (window-buffer w))))
+                                window-list)))
+    (if filtered-window-list
+        (select-window (car filtered-window-list))
+      (and window-list
+           (select-window (car window-list))))))
+
+#+end_src
+
+#+RESULTS:
+: my-other-window
+
+* Look and feel
+#+BEGIN_SRC emacs-lisp
+(setq section 'look-and-feel)
+#+END_SRC
+
+** Faces
+#+begin_src emacs-lisp
+;; face to prevent global-hl-line-mode interfering with iedit face
+(defface highlight-iedit
+  '((((class color) (min-colors 88) (background light))
+     :background "darkseagreen2")
+    (((class color) (min-colors 88) (background dark))
+     :background "darkolivegreen")
+    (((class color) (min-colors 16) (background light))
+     :background "darkseagreen2")
+    (((class color) (min-colors 16) (background dark))
+     :background "darkolivegreen")
+    (((class color) (min-colors 8))
+     :background "green" :foreground "black")
+    (t :inverse-video t))
+  "Basic face for highlighting."
+  :group 'basic-faces)
+#+end_src
+
+
+** GUI
+
+#+begin_src emacs-lisp
+  (menu-bar-mode 0)
+  (tool-bar-mode 0)
+#+end_src
+
+** modeline
+*** File path
+#+begin_src emacs-lisp
+  ;;(setq uniquify-buffer-name-style 'forward)
+  ;;(require 'uniquify)
+
+(defun add-mode-line-dirtrack ()
+    "When editing a file, show the last 2 directories of the current path in the mode line."
+    (add-to-list 'mode-line-buffer-identification
+                 '(:eval (substring default-directory
+                                    (+ 1 (string-match "/[^/]+/[^/]+/$" default-directory)) nil))))
+  (add-hook 'find-file-hook 'add-mode-line-dirtrack)
+#+end_src
+
+*** svg-modeline
+#+begin_src emacs-lisp
+  (ensure-package 'svg-mode-line-themes)
+  ;; Looks good, but doesnt show me what I need, yet
+  ;;(load-file (expand-file-name "site-lisp/ocodo-svg-mode-line.el" init-dir))
+#+end_src
+
+
+** COMMENT Scrolling
+
+#+begin_src emacs-lisp
+  (ensure-package 'smooth-scrolling)
+
+  (setq smooth-scroll-margin 5)
+  (setq scroll-step            1
+          scroll-conservatively  10000)
+#+end_src
+
+** neotree width
+#+begin_src emacs-lisp
+  (setq neo-window-width 25)
+
+#+end_src
+
+** hlline -- Highlight current cursor row
+#+begin_src emacs-lisp
+  (global-hl-line-mode 0)
+#+end_src
+
+** rainbow mode
+#+BEGIN_SRC emacs-lisp
+  ;; (ensure-package 'rainbow-mode)
+  ;; (add-hook 'clojure-mode (lambda () (rainbow-mode t)))
+
+#+END_SRC
+
+#+END_SRC
+
+* Editing tools
+#+BEGIN_SRC emacs-lisp
+(setq section 'editing)
+#+END_SRC
+** image dired
+#+BEGIN_SRC emacs-lisp
+(setq image-dired-cmd-create-thumbnail-options "%p -size %wx%h \"%f\" -resize \"%wx%h>\" jpeg:\"%t\"") ;; remove -strip option
+(setq image-dired-cmd-create-temp-image-options "%p -size %wx%h \"%f\" -resize \"%wx%h>\" jpeg:\"%t\"");; remove -strip option
+;;(setq image-dired-external-viewer "/usr/bin/xzgv");; a viewer I like, just in case you're interested
+#+END_SRC
+
+#+RESULTS:
+: %p -size %wx%h "%f" -resize "%wx%h>" jpeg:"%t"
+
+** image+
+#+BEGIN_SRC emacs-lisp
+(ensure-package 'image+)
+#+END_SRC
+
+#+RESULTS:
+: image+
+
+** Expand region
+
+#+begin_src emacs-lisp
+  (ensure-package 'expand-region)
+#+end_src
+
+** Key chords
+
+#+begin_src emacs-lisp
+  (ensure-package 'key-chord)
+  (key-chord-mode 1)
+
+  (fset 'backtab
+     (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ([21 45 50 24 tab] 0 "%d")) arg)))
+
+  (fset 'forwardtab
+     (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ([21 50 24 tab] 0 "%d")) arg)))
+#+end_src
+
+** Selective display
+
+#+begin_src emacs-lisp
+  (defvar ts/selective-display-level 0)
+  (defvar ts/selective-display-level-step 2)
+  (defvar ts/max-selective-display-level 6)
+
+  (make-local-variable 'ts/selective-display-level)
+
+  (defun ts/next-selective-display-level ()
+    (if (>= ts/selective-display-level ts/max-selective-display-level)
+       (setq ts/selective-display-level 0)
+       (incf ts/selective-display-level ts/selective-display-level-step))
+
+    (if (> ts/selective-display-level 0)
+        ts/selective-display-level))
+
+
+  (defun ts/toggle-selective-display ()
+    (interactive)
+    (set-selective-display (ts/next-selective-display-level)))
+
+  (defun ts/reset-selective-display ()
+    (interactive)
+    (setq ts/selective-display-level ts/max-selective-display-level)
+    (set-selective-display (ts/next-selective-display-level)))
+
+  (global-set-key (kbd "C-`") 'ts/toggle-selective-display)
+  (global-set-key (kbd "C-1") 'ts/reset-selective-display)
+
+#+end_src
+
+** FOlding
+#+begin_src emacs-lisp
+  (ensure-package 'yafolding)
+#+end_src
+
+** wgrep
+#+begin_src emacs-lisp
+  (ensure-package 'wgrep)
+#+end_src
+
+* Searching
+#+BEGIN_SRC emacs-lisp
+(setq section 'searching)
+#+END_SRC
+** Bookmarks+
+#+begin_src emacs-lisp
+  (ensure-package 'bookmark+)
+  (setq bookmark-save-flag 1)
+#+end_src
+
+** Project root
+
+#+begin_src emacs-lisp
+  (ensure-package 'project-root)
+  (setq project-roots
+        '(
+          ("Generic Git Project" :root-contains-files (".git"))))
+
+  (defun ts/project-root ()
+    (with-project-root
+      (cdr project-details)))
+
+  (defun ts/grep-project (term)
+    (interactive
+     (list (if (use-region-p)
+               (buffer-substring (region-beginning) (region-end))
+               (read-string "grep: "))))
+    (grep (concat "grep -nH -iR --exclude='*.old' --exclude='*.edn' --exclude-dir='target' --exclude='*.log' --exclude='*.map' --exclude='*.json' --exclude='TAGS' --exclude-dir='builtAssets' --exclude-dir='lcov-report' --exclude-dir='build' --exclude-dir='node_modules' --exclude-dir='coverage' --exclude='*.css' --exclude='*.js' --exclude='.#*' -e \""
+  ;;                term  "\" " (ts/project-root) "*" " | cut -c 1-160"
+                  term  "\" " (ts/project-root) "*"
+                  )))
+#+end_src
+
+** Projectile
+#+BEGIN_SRC emacs-lisp
+  (ensure-package 'projectile)
+  (projectile-global-mode)
+  (setq projectile-indexing-method 'native)
+  ;;(setq projectile-require-project-root nil)
+  ;;(setq projectile-project-root-files nil)
+#+END_SRC
+
+** COMMENT Ido-menu
+
+#+begin_src emacs-lisp
+    (ensure-package 'spinner)
+
+    (ensure-package 'ido)
+    ;;(ensure-package 'idomenu)
+    (ensure-package 'flx)
+    (ensure-package 'ido-ubiquitous)
+
+    (flx-ido-mode 1)
+
+    (ensure-package 'ido-vertical-mode)
+    (ido-vertical-mode)
+
+    (ido-mode 1)
+    (setq ido-enable-flex-matching t)
+    (setq ido-use-faces nil)
+
+    (setq ido-enable-prefix nil
+        ido-enable-flex-matching t
+        ido-case-fold nil
+        ido-auto-merge-work-directories-length -1
+        ido-create-new-buffer 'always
+        ido-use-filename-at-point nil
+        ido-max-prospects 10)
+
+    (setq ido-decorations (quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
+
+    ;; Ido at point (C-,)
+    (ensure-package 'ido-at-point)
+    (ido-at-point-mode)
+
+    ;; This gives me clj-refactor add dependency minibuffer narrowing - awesome!
+    (ido-ubiquitous-mode 1)
+
+    (defun ts/ido-forward ()
+      (interactive)
+      (ido-next-match))
+
+    (defun ts/ido-backwards ()
+      (interactive)
+      (ido-prev-match))
+
+
+    (defun ts/ido-define-keys () ;; C-n/p is more intuitive in vertical layout
+      (define-key ido-completion-map (kbd "C-n") 'ts/ido-forward)
+      (define-key ido-completion-map (kbd "C-p") 'ts/ido-backwards))
+    (add-hook 'ido-setup-hook 'ts/ido-define-keys)
+
+    (defun ido-disable-line-truncation () (set (make-local-variable 'truncate-lines) nil))
+    (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-truncation)
+
+  ;; not sure i need this. am trying to figure out how clj-refactor can auto expand requires
+  ;; ;; Fix ido-ubiquitous for newer packages
+  ;; (defmacro ido-ubiquitous-use-new-completing-read (cmd package)
+  ;;   `(eval-after-load ,package
+  ;;      '(defadvice ,cmd (around ido-ubiquitous-new activate)
+  ;;         (let ((ido-ubiquitous-enable-compatibility nil))
+  ;;           ad-do-it))))
+
+  ;; (ido-ubiquitous-use-new-completing-read webjump 'webjump)
+  ;; (ido-ubiquitous-use-new-completing-read yas/expand 'yasnippet)
+  ;; (ido-ubiquitous-use-new-completing-read yas/visit-snippet-file 'yasnippet)
+
+
+#+end_src
+
+** neotree
+
+#+begin_src emacs-lisp
+  (ensure-package 'neotree)
+
+  (defun neotree-of-current-project ()
+    (interactive)
+    (let ((file (buffer-file-name))
+          (root (ts/project-root)))
+      (neotree-dir root)
+      (neotree-find file)))
+#+end_src
+
+* Development
+#+BEGIN_SRC emacs-lisp
+(setq section 'development)
+#+END_SRC
+** docs
+#+BEGIN_SRC emacs-lisp
+(ensure-package 'async)
+(ensure-package 'helm-dash)
+(ensure-package 'counsel-dash)
+#+END_SRC
+
+** rust
+#+BEGIN_SRC emacs-lisp
+;;(ensure-package 'rust-mode)
+;;(ensure-package 'cargo)
+#+END_SRC
+
+** haskell
+#+BEGIN_SRC emacs-lisp
+;;(ensure-package 'haskell-mode)
+#+END_SRC
+
+** maxima
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "/usr/share/maxima/5.38.0/emacs/")
+(autoload 'maxima-mode "maxima" "Maxima mode" t)
+ (autoload 'imaxima "imaxima" "Frontend for maxima with Image support" t)
+ (autoload 'maxima "maxima" "Maxima interaction" t)
+ (autoload 'imath-mode "imath" "Imath mode for math formula input" t)
+ (setq imaxima-use-maxima-mode-flag t)
+ (add-to-list 'auto-mode-alist '("\\.ma[cx]" . maxima-mode))
+
+#+END_SRC
+
+** rustlang
+#+BEGIN_SRC emacs-lisp
+;;(ensure-package 'rust-mode)
+#+END_SRC
+
+** golang
+#+BEGIN_SRC emacs-lisp
+(setq section 'golang)
+
+(ensure-package 'go-mode)
+
+(require 'go-mode-autoloads)
+(setq gofmt-command "goimports")
+
+(ensure-package 'go-autocomplete)
+(with-eval-after-load 'go-mode
+   (require 'go-autocomplete))
+
+(add-to-list 'load-path (concat (getenv "GOPATH")  "/src/github.com/golang/lint/misc/emacs"))
+;;(require 'golint)
+
+(setq exec-path (cons "/home/tristan/vendor/go/bin" exec-path))
+(add-to-list 'exec-path "/home/tristan/me/projects/go/bin")
+(add-hook 'before-save-hook 'gofmt-before-save)
+(defun my-go-mode-hook ()
+  (local-set-key (kbd "M-.") 'godef-jump)
+  (local-set-key (kbd "M-,") 'pop-tag-mark)
+  (local-set-key (kbd "C-x f") 'go-test-current-file)
+
+  (yafolding-mode)
+  (yas-minor-mode 1)
+  (auto-complete-mode 1))
+
+(add-hook 'go-mode-hook 'my-go-mode-hook)
+
+(ensure-package 'go-test)
+
+#+END_SRC
+
+** arduino-mode
+#+BEGIN_SRC emacs-lisp
+;;(ensure-package 'arduino-mode)
+#+END_SRC
+
+** yaml-mode
+#+BEGIN_SRC emacs-lisp
+(ensure-package 'yaml-mode)
+#+END_SRC
+
+** auctex
+#+BEGIN_SRC emacs-lisp
+;;(ensure-package 'auctex)
+(setq section 'auctex)
+#+END_SRC
+
+** Erlang
+#+begin_src emacs-lisp
+;;  (ensure-package 'edts)
+#+end_src
+
+** Coffee script
+
+#+begin_src emacs-lisp
+  (ensure-package 'coffee-mode)
+  (require 'coffee-mode)
+
+  (defun coffee-custom ()
+    "coffee-mode-hook"
+    ;;(local-set-key (kbd "C-c C-r") 'coffee-compile-region)
+    (local-set-key (kbd "<backtab>") 'coffee-indent-shift-left)
+    (local-set-key (kbd "C-c C-c") 'coffee-compile-buffer-or-region)
+    (set (make-local-variable 'tab-width) 2)
+    (set (make-local-variable 'indent-tabs-mode) nil)
+    (yafolding-mode))
+
+  (add-hook 'coffee-mode-hook
+            '(lambda() (coffee-custom)))
+
+  (custom-set-variables '(coffee-tab-width 2))
+
+  (defun run-shell-command-in-dir (dir command)
+    (message (concat "DIR:" dir " COMMAND: " command))
+    (let ((default-directory dir))
+      (async-shell-command command)))
+
+  (defun coffee-on-file ()
+    (interactive)
+    (run-shell-command-in-dir (file-name-directory (buffer-file-name))
+                              (concat "NODE_ENV=development coffee --nodejs --harmony-proxies " (shell-quote-argument buffer-file-name))))
+
+  (defun coffee-compile-buffer-or-region ()
+    (interactive)
+    (if (use-region-p)
+        (coffee-compile-region (region-beginning) (region-end))
+      (coffee-compile-buffer)))
+#+end_src
+
+#+BEGIN_SRC emacs-lisp
+  (defun run-jshint-coffee()
+    "Runs all the tests in the current buffer"
+    (interactive)
+    (let* (command exit-value (buf-name (buffer-file-name))
+                   (temp-file (concat buf-name ".js"))
+                   (temp-jshint-file (concat temp-file ".hint")))
+
+
+      (setq command (concat "coffee -p -b -c \"" buf-name "\" > " temp-file))
+      (setq exit-value (shell-command command))
+
+      (setq command (concat "jshint --verbose --config /home/tristan/.jshintrc \"" temp-file "\" > " temp-jshint-file))
+      (setq exit-value (shell-command command))
+
+      (let ((buffer (create-file-buffer temp-jshint-file)))
+        (with-current-buffer buffer
+          (erase-buffer)
+          (insert-file-contents temp-jshint-file)
+          (delete-file temp-file)
+          (delete-file temp-jshint-file))
+
+        (display-buffer buffer))))
+#+END_SRC
+
+#+begin_src emacs-lisp
+  (ensure-package 'flymake-coffee)
+  (add-hook 'coffee-mode-hook 'flymake-coffee-load)
+  (setq flymake-coffee-coffeelint-configuration-file
+    "/home/tristan/.cslint-config.json")
+  (ensure-package 'flymake-cursor)
+#+end_src
+
+** Ruby
+#+begin_src emacs-lisp
+  (ensure-package 'inf-ruby)
+#+end_src
+
+** Gherkin
+
+#+begin_src emacs-lisp
+  (ensure-package 'cucumber)
+#+end_src
+
+** js-lookup
+#+begin_src emacs-lisp
+  (ensure-package 'js-lookup)
+#+end_src
+
+** javascript
+#+begin_src emacs-lisp
+  (ensure-package 'js2-mode)
+#+end_src
+
+** webmode
+#+BEGIN_SRC emacs-lisp
+(ensure-package 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+(add-hook 'web-mode-hook
+  (lambda ()
+  (web-mode-set-content-type "jsx")
+  (message "now set to: %s" web-mode-content-type)))
+#+END_SRC
+
+** json
+#+begin_src emacs-lisp
+  (ensure-package 'json-reformat)
+#+end_src
+
+** ecb
+#+BEGIN_SRC emacs-lisp
+;;(ensure-package 'ecb)
+#+END_SRC
+
+** Jade
+
+#+begin_src emacs-lisp
+  (ensure-package 'jade-mode)
+#+end_src
+
+** org-babel
+#+begin_src emacs-lisp
+  (setq org-confirm-babel-evaluate nil)
+
+  ;; Get syntax highlighting within begin-src blocks
+  (setq org-src-fontify-natively t)
+
+  (setq org-ditaa-jar-path "/usr/share/ditaa/ditaa.jar")
+
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+  (setq temporary-file-directory (expand-file-name "/tmp"))
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((R . t)
+     (emacs-lisp . t)
+     (ditaa . t)
+     (ruby . t)
+     (shell . t)
+     (perl . t)
+     (python . t)
+     (plantuml . t)
+     (js . t)
+     (sql . t)
+     (clojure . t)
+     (maxima . t)
+     (latex . t)))
+
+  (setq org-latex-create-formula-image-program 'dvipng)
+  ;;(setq org-latex-create-formula-image-program 'imagemagick)
+
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+  (defun show-tex ()
+    (org-toggle-latex-fragment))
+
+  ;;(remove-hook 'org-babel-after-execute-hook 'show-tex)
+
+  (setq org-plantuml-jar-path (expand-file-name "~/vendor/plantuml/plantuml.jar"))
+
+
+(defun tangle-on-save-org-mode-file()
+  (when (string= (message "%s" major-mode) "org-mode")
+    (org-babel-tangle)))
+
+(add-hook 'after-save-hook 'tangle-on-save-org-mode-file)
+#+end_src
+
+** Mocha test runner
+
+#+begin_src emacs-lisp
+  (require 'compile)
+
+  (defun mocha-errors ()
+    (interactive)
+
+    (local-set-key (kbd "<tab>") 'next-error-no-select)
+    (local-set-key (kbd "<backtab>") 'previous-error-no-select)
+
+    (make-local-variable 'compilation-error-regexp-alist)
+
+    (pushnew '("\\([_[:alnum:]-/]+[.]\\(coffee\\|js\\)\\):\\([[:digit:]]+\\):[[:digit:]]+"
+       1 3) compilation-error-regexp-alist)
+
+  )
+  (defvar previous-test nil)
+  (defun run-current-test (watchp)
+      (let* ((root (ts/project-root))
+             (filename (buffer-file-name))
+             (relative-test-filename (file-relative-name filename root))
+             (test-to-run relative-test-filename))
+
+        (setq previous-test relative-test-filename)
+
+        (run-shell-command-in-dir root (concat "TZ=utc SELENIUM_REATTACH=1 SELENIUM_HOST=localhost:4444 NODE_ENV=test " root "node_modules/.bin/mocha --bail --harmony_proxies "
+                                               (if watchp " -w " "")
+                                               test-to-run
+
+                                               ))
+
+        (with-current-buffer "*Async Shell Command*"
+            ;;(compilation-mode)
+            ;;(other-window 1)
+            ;;(beginning-of-buffer)
+            )))
+
+  (defun run-mocha (arg)
+      (interactive "P")
+
+      (run-current-test (equal arg '(4) )))
+
+  (add-hook 'compilation-mode-hook 'mocha-errors)
+#+end_src
+
+** elisp
+#+BEGIN_SRC emacs-lisp
+
+(ensure-package 'elisp-slime-nav)
+(dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
+  (add-hook hook 'elisp-slime-nav-mode))
+#+END_SRC
+
+* Gnus
+#+BEGIN_SRC emacs-lisp
+(setq section 'gnus)
+#+END_SRC
+#+begin_src emacs-lisp
+(setq gnus-select-method '(nntp "news.gmane.org"))
+#+end_src
+
+* Agenda
+#+BEGIN_SRC emacs-lisp
+(message "Loading agenda")
+(setq section 'agenda)
+#+END_SRC
+
+#+begin_src emacs-lisp
+  (setq org-agenda-files (list "~/me/index.org" "~/SpiderOak Hive/me/tasks.org" "~/SpiderOak Hive/me/journal.org"))
+     (setq org-clock-persist 'history)
+     (org-clock-persistence-insinuate)
+(add-hook 'org-after-todo-state-change-hook
+	       'org-clock-in)
+#+end_src
+
+* RSS
+#+BEGIN_SRC emacs-lisp
+(setq section 'rss)
+#+END_SRC
+#+begin_src emacs-lisp
+;;  (ensure-package 'elfeed)
+#+end_src
+
+* Browser
+#+BEGIN_SRC emacs-lisp
+(setq section 'browser)
+#+END_SRC
+#+begin_src emacs-lisp
+  (setq browse-url-browser-function 'eww-browse-url)
+#+end_src
+
+* Web
+
+#+begin_src emacs-lisp
+
+(defvar-local endless/display-images t)
+
+(defun endless/toggle-image-display ()
+  "Toggle images display on current buffer."
+  (interactive)
+  (setq endless/display-images
+        (null endless/display-images))
+  (endless/backup-display-property endless/display-images))
+
+(defun endless/backup-display-property (invert &optional object)
+  "Move the 'display property at POS to 'display-backup.
+Only applies if display property is an image.
+If INVERT is non-nil, move from 'display-backup to 'display
+instead.
+Optional OBJECT specifies the string or buffer. Nil means current
+buffer."
+  (let* ((inhibit-read-only t)
+         (from (if invert 'display-backup 'display))
+         (to (if invert 'display 'display-backup))
+         (pos (point-min))
+         left prop)
+    (while (and pos (/= pos (point-max)))
+      (if (get-text-property pos from object)
+          (setq left pos)
+        (setq left (next-single-property-change pos from object)))
+      (if (or (null left) (= left (point-max)))
+          (setq pos nil)
+        (setq prop (get-text-property left from object))
+        (setq pos (or (next-single-property-change left from object)
+                      (point-max)))
+        (when (eq (car prop) 'image)
+          (add-text-properties left pos (list from nil to prop) object))))))
+#+end_src
+
+* Keys
+
+#+begin_src emacs-lisp
+  (ensure-package 'unbound)
+#+end_src
+
+** avy keys
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-)") 'avy-goto-line)
+#+end_src
+
+
+** Misc keys
+#+begin_src emacs-lisp
+    (global-set-key (kbd "C-x o") 'other-window)
+
+
+    (global-set-key (kbd "C-c C-y") 'ts/grep-project)
+    (global-set-key (kbd "M-`") 'neotree-of-current-project)
+    (global-set-key (kbd "C-c C-f") 'neotree-find)
+    (global-set-key (kbd "C-. f") 'ffap)
+    (global-set-key (kbd "C-=") 'er/expand-region)
+    (global-set-key (kbd "M-1") 'coffee-on-file)
+    (global-set-key (kbd "C-c m") 'run-mocha)
+    (key-chord-define-global "DF" 'backtab)
+
+    (defun setup-jshint-coffee ()
+      (local-set-key (kbd "C-c j") 'run-jshint-coffee))
+
+    (add-hook 'coffee-mode-hook 'setup-jshint-coffee)
+
+    (defun setup-eww ()
+      (local-set-key (kbd "C-c i") 'endless/toggle-image-display))
+
+    (add-hook 'eww-mode-hook 'setup-eww)
+
+    ;; (global-set-key (kbd "<XF86AudioRaiseVolume>") 'raise-volume)
+    ;; (global-set-key (kbd "<XF86AudioLowerVolume>") 'lower-volume)
+    (global-set-key (kbd "M-0") 'ace-window)
+
+    (defvar yafolding-mode-map
+      (let ((map (make-sparse-keymap)))
+        (define-key map (kbd "<C-S-return>") #'yafolding-hide-parent-element)
+        (define-key map (kbd "<C-M-return>") #'yafolding-toggle-all)
+        (define-key map (kbd "<C-return>") #'yafolding-toggle-element)
+        map))
+
+  ;; TODO move non-key related stuff to Development
+
+
+  (global-set-key (kbd "C-,") 'completion-at-point)
+#+end_src
+
+* Desktop
+#+begin_src emacs-lisp
+  ;; commented out because workgroups may be a better option
+  ;;(desktop-read)
+  ;;(desktop-save-mode 1)
+#+end_src
+* Welcome
+#+BEGIN_SRC emacs-lisp
+(setq section 'welcome)
+#+END_SRC
+
+#+begin_src emacs-lisp
+  ;; disabled to test wg-load
+  (setq inhibit-splash-screen t)
+  (message "Done!")
+  ;;(welcome-screen)
+#+end_src
+#+BEGIN_SRC emacs-lisp
+(ensure-package 'zeal-at-point)
+(global-set-key "\C-cd" 'zeal-at-point)
+#+END_SRC
+* Key overrides
+#+BEGIN_SRC emacs-lisp
+ (define-key global-map [(insert)] nil)
+ (define-key global-map [(control insert)] 'overwrite-mode)
+#+END_SRC
+* magit
+#+BEGIN_SRC emacs-lisp
+(setq magit-auto-revert-mode nil)
+#+END_SRC
